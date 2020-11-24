@@ -61,9 +61,9 @@ where that is), and put your own HTML presentation in there. Remember that
 If your favourite text editor doesn't have markdown-to-HTML capability to make
 this simple then, uh, maybe you need to find a new favourite.
 
-Maybe add HTML styling (there are classes like `a`, `b`, `c`, ...`z`) which do
-highlighter colour on mouse-over (or `rainbow` to do a whole paragraph with
-random colours).
+FeeblePoint2 has 26 classes (like `a`, `b`, `c`, ...`z`) which do highlighter
+colour on mouse-over (or `rainbow` to do a whole paragraph with random colours)...
+so add CSS classes to your HTML to make that happen.
 
 If you want to change the behaviour of FeeblePoint2, the key features are
 exposed as JavaScript constants to make this easier for you (see next section).
@@ -143,8 +143,8 @@ maybe move your anchors onto elements before the headings, so they are remain
 untouched.
 
 > Powerpoint is nearly always used for the convenience of the author,
-> not the people at whom their presented is being fired. We can do better
-> than that. Up with FeeblePoint and things like it!
+> not the people at whom their presentation is being fired. We can do
+> better than that. Up with FeeblePoint and things like it!
 >
 > ![Feeblepoint Logo](https://camo.githubusercontent.com/acaf275db6bc1a973594051e06baa79933024da88acdb21546e762fa914ab35b/687474703a2f2f7777772e6265686f6c6465722e636f2e756b2f666565626c65706f696e742f64656d6f2f666565626c65706f696e742f666565626c65706f696e745f6c6f676f5f3230305f785f3132302e676966)
 
