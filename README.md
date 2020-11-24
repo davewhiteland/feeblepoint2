@@ -110,7 +110,7 @@ For nerds, [Feelblepoint](https://www.beholder.uk/feeblepoint/) was a way to
 prepare an ignite talk, or things like ignite talks. It saw some action, but
 these days you should use [reveal.js](https://revealjs.com) instead.
 
-This one-pager (FeeblePoint2) been handy for me, I hope it's handy for you too.
+This one-pager (FeeblePoint2) has been handy for me, I hope it's handy for you too.
 Being able to clearly indicate which part of the thing you're talking about
 whilst sharing a screen on a "video call" or presentation seems to be a fairly
 basic requirement.
