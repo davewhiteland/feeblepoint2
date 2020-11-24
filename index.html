@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <!-- 
+    FeeblePoint2: basic HTML presentation page for e.g., screen-sharing slides
+    https://davewhiteland.github.io/feeblepoint2/
+    Edit JavaScript settings in <script> tag below.
+  -->
+      
+  <!-- add your title here -->
+  <title>FeeblePoint2</title>
+  
+  <meta name="viewport" content="width=device-width" />
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
+  <style>
+  
+  /* change pointer colours here! */
+  :root {
+    --fingerfill: #ffff00;
+    --fingerstroke: #000000;
+    --ringstroke: #ff0000;
+  }
+  
+  /* pointer: 6em × 6em containing a square SVG */
+  #fp2-pointer {
+    visibility: hidden; opacity: 0.00;
+    width:6em;
+    height:6em;
+    margin:-3em; /* position center of image at cursor */
+    padding:0;
+    pointer-events: none;
+    position:absolute; 
+    top:0; 
+    left:0;
+  }
+  #fp2-pointer.fp2-pointer-displayed { visibility: visible; opacity: 0.75; }
+  #fp2-pointer svg { width:6em; height: 6em; }
+  /*
+    each pointer type has its own class (currently: finger, ring) 
+    ...override their settings here
+  */
+  #fp2-pointer.finger { opacity: 0.90; } 
+  #fp2-pointer.ring { } 
+  .fp2-cursor-off { cursor: none; }  
+    
+  /* 26 colours for single-letter class mouseover highlighting effect. */
+  .a:hover{ background-color: #000000; outline: 0.15em solid #000000; color: #fff;} /*  Black        */
+  .b:hover{ background-color: #000080; outline: 0.15em solid #000080; color: #fff;} /*  Navy         */
+  .c:hover{ background-color: #0000af; outline: 0.15em solid #0000af; color: #fff;} /*  Blue3        */
+  .d:hover{ background-color: #0000ff; outline: 0.15em solid #0000ff; color: #fff;} /*  Blue         */
+  .e:hover{ background-color: #008000; outline: 0.15em solid #008000; color: #fff;} /*  Green        */
+  .f:hover{ background-color: #008080; outline: 0.15em solid #008080; color: #fff;} /*  Teal         */
+  .g:hover{ background-color: #008700; outline: 0.15em solid #008700; color: #fff;} /*  Green4       */
+  .h:hover{ background-color: #00af87; outline: 0.15em solid #00af87; color: #fff;} /*  DarkCyan     */
+  .i:hover{ background-color: #00ff00; outline: 0.15em solid #00ff00; color: #000;} /*  Lime	        */
+  .j:hover{ background-color: #00ffff; outline: 0.15em solid #00ffff; color: #000;} /*  Aqua         */
+  .k:hover{ background-color: #800000; outline: 0.15em solid #800000; color: #fff;} /*  Maroon       */
+  .l:hover{ background-color: #800080; outline: 0.15em solid #800080; color: #fff;} /*  Purple       */
+  .m:hover{ background-color: #808000; outline: 0.15em solid #808000; color: #fff;} /*  Olive        */
+  .n:hover{ background-color: #808080; outline: 0.15em solid #808080; color: #fff;} /*  Grey         */
+  .o:hover{ background-color: #8700af; outline: 0.15em solid #8700af; color: #fff;} /*  DarkMagenta  */
+  .p:hover{ background-color: #875fff; outline: 0.15em solid #875fff; color: #fff;} /*  SlateBlue1   */
+  .q:hover{ background-color: #87afff; outline: 0.15em solid #87afff; color: #000;} /*  SkyBlue2     */
+  .r:hover{ background-color: #c0c0c0; outline: 0.15em solid #c0c0c0; color: #000;} /*  Silver       */
+  .s:hover{ background-color: #d78700; outline: 0.15em solid #d78700; color: #fff;} /*  Orange3      */
+  .t:hover{ background-color: #d787ff; outline: 0.15em solid #d787ff; color: #fff;} /*  Violet       */
+  .u:hover{ background-color: #ff0000; outline: 0.15em solid #ff0000; color: #fff;} /*  Red          */
+  .v:hover{ background-color: #ff00ff; outline: 0.15em solid #ff00ff; color: #fff;} /*  Fuchsia      */
+  .w:hover{ background-color: #ff5faf; outline: 0.15em solid #ff5faf; color: #000;} /*  HotPink      */
+  .x:hover{ background-color: #ff8700; outline: 0.15em solid #ff8700; color: #000;} /*  DarkOrange   */
+  .y:hover{ background-color: #ffd700; outline: 0.15em solid #ffd700; color: #000;} /*  Gold1        */
+  .z:hover{ background-color: #ffff00; outline: 0.15em solid #ffff00; color: #000;} /*  Yellow       */
+  .a,.b,.c,.d,.e,.f,.g,.h,.i,.j,.k,.l,.m,.n,.o,.p,.q,.r,.s,.t,.u,.v,.w,.x,.y,.z
+    { transition: background 0.25s, outline 0.25s; }
+    
+  #fp2-legend {
+    width: 98%;
+    margin: 0 auto 2em auto;
+    color: #999;
+    font-size:16pt;
+    line-height:2;
+    text-align: center;
+    padding-bottom:0.5em;
+    border-bottom:1px solid #dddddd;
+  }
+  #fp2-legend ul { list-style: none; margin:0; padding:0;}
+  #fp2-legend li { display:inline-block; padding: 0 0.2em;}
+  .fp2-key {
+    padding: 0em 0.2em; background-color: #bbb; color: #fff;
+    border:1px solid #999;
+    font-weight: bold; border-radius: 0.25em; 
+    min-width:1.5em; display: inline-block;
+  }
+  .fp2 h2:not(:first-of-type) { margin-top:110vh; }
+  h2 { padding-top:0.2em; clear:both; }
+
+
+
+
+  /* everything below here is "just" document styling to personal taste */
+    
+  body {
+    /* it's hard to guess font-size for presentations: check your screen! */
+    font-size: 300%;
+    font-family: "Source Sans Pro","Helvetica Neue",Arial,Helvetica,sans-serif;
+    padding: 0 1em; 
+  }
+  
+  /* make whatever classes will be helpful for your presentation :-) */
+  .big, .biggish{
+    text-align:center;
+    font-size: 8rem;
+    padding:0.5em 0.2em 0.5em 0.2em;
+  }
+  .biggish {
+    font-size:6rem;
+  }
+  .less-big{
+    text-align:center;
+    font-size: 4rem;
+    padding:0.5em 0.2em 0.5em 0.2em;
+  }
+  .big p, .less-big p {
+    margin:0;
+    padding:0.5em 02.em;
+  }
+  .small { font-size: 80%; }
+  .red {background: #880000; color: #ffffff;}
+  .green {background: #008800; color: #ffffff;}
+  .blue {background: #000088; color: #ffffff;}
+  .black {background: #000000; color: #ffffff;}
+  .hide { opacity: 0; height:0.5em; padding-top:0.1em;}
+  
+  img.fill { width: 100%;}
+  img.half-fill { width: 50%;}
+
+  .left { text-align:left; }    
+  .right { text-align:right; }
+  .center { text-align:center; }
+  ol { margin: 0 1em 1em 1em; }
+  .code {
+    background:black;
+    color:#99ff99;
+    padding:2em;
+  }
+  .code.squashed{
+    padding:1em 0.5em;
+  }  
+  table.code {
+    padding:0;
+    border:2px solid green;
+    background:black;
+    font-family:sans-serif;
+    color:#99ff99;
+    border-collapse:collapse;
+  }
+  table.code td {
+    padding:0.2em;
+    border:2px solid green;
+  }
+  .error { color:red; }
+  .tiny-footer { font-size:20px; padding:2em; text-align:left;}
+  .tiny-footer img { float:right;}
+  
+  </style>
+</head>
+<body>
+  
+<!-- Enable JavaScript in your browser,                       -->
+<!-- use <h2>headings<h2> at the start of each "slide"        -->
+  
+<!-- =====                                             ====== -->
+<!-- =====  your presentation content goes below here  ====== -->
+<!-- =====                                             ====== -->
+<!-- =====                      VVV                    ====== -->
+<!-- =====                      VVV                    ====== -->
+<!-- =====                      VVV                    ====== -->
+<!-- =====                   VVVVVVVVV                 ====== -->
+<!-- =====                    VVVVVVV                  ====== -->
+<!-- =====                     VVVVV                   ====== -->
+<!-- =====                      VVV                    ====== -->
+<!-- =====                       V                     ====== -->
+
+
+
+
+<h2>FeeblePoint2</h2>
+<div class="biggish blue">
+  Presentation template
+</div>
+<p class="right">...press ENTER to advance</p>
+
+
+<h2>Everything is in this HTML file</h2>
+<div class="less-big green rainbow">
+  So you can duplicate this one file and&nbsp;edit&nbsp;it
+</div>
+<div class="less-big red rainbow">
+  (works with file: or http: protocols)
+</div>
+
+
+<h2>Pointer embedded in the file</h2>
+<div class="less-big blue">
+  Press the  <span class="fp2-key">P</span> key to toggle it
+</div>
+<div class="less-big red">
+  or  <span class="fp2-key">⇧P</span> for the one ring
+</div>
+
+
+<h2>Quick, big HTML slides</h2>
+<div class="big red">
+  use &lt;h2&gt; headings to mark slides
+</div>
+
+
+<h2>Hover over text for highlights</h2>
+<pre class="squashed code">
+&lt;div class="rainbow"&gt;add class=rainbow
+for random colour on hover&lt;/div&gt;
+</pre>
+<div class="less-big red rainbow">
+  add class=rainbow for
+  random colour on hover
+</div>
+
+
+<h2>Classes a, b, c, ... z for hover colours</h2>
+<pre class="code">
+&lt;span class="a"&gt;for&lt;/span&gt; an
+&lt;span class="u"&gt;example&lt;/span&gt;
+</pre>
+<div class="less-big">
+  <span class="a">for</span> an
+  <span class="u">example</span>
+</div>
+
+
+<h2>Of course you can change your CSS</h2>
+<div class="less-big green rainbow">
+  It doesn’t have to look like this!
+</div>
+<p class="center">
+  (this happens to be my default)
+</p>
+
+
+<h2>Edit JavaScript to change keys/features</h2>
+<pre class="code">
+const WANT_POINTER_ACTIONS = true;
+
+const KEY_FOR_POINTER_RING = "shift+KeyP";
+</pre>
+
+
+<h2>ENTER jumps between the slides</h2>
+<div class="less-big red rainbow">
+  Jumping updates the URL,<br>so if you get lost
+</div>
+<div class="less-big black rainbow">
+  refreshing the page probably saves you
+</div>
+
+
+<h2>Can disable jumping entirely</h2>
+<div class="less-big">
+  Useful if you really just want
+  the pointer code to run in a
+  <a href="https://revealjs.com">reveal.js</a>
+  presentation instead
+</div>
+
+
+<h2>FeeblePoint2: that’s all</h2>
+<div class="less-big green">
+  Jump to beginning
+</div>
+<div class="less-big red">
+  by pressing zero 
+  <span class="fp2-key">0</span>
+</div>
+<div class="tiny-footer">
+  <a href="https://github.com/davewhiteland/feeblepoint2">FeeblePoint2&nbsp;on&nbsp;GitHub</a>
+  <a href="https://github.com/davewhiteland/feeblepoint2"><img src="feeblepoint-logo-200-x-120.gif" alt="powered by FeeblePoint2"/></a>
+</div>
+
+
+<!-- =====                       ^                     ====== -->
+<!-- =====                      ^^^                    ====== -->
+<!-- =====                     ^^^^^                   ====== -->
+<!-- =====                    ^^^^^^^                  ====== -->
+<!-- =====                   ^^^^^^^^^                 ====== -->
+<!-- =====                      ^^^                    ====== -->
+<!-- =====                      ^^^                    ====== -->
+<!-- =====                      ^^^                    ====== -->
+<!-- =====                                             ====== -->
+<!-- =====  your presentation content goes above here  ====== -->
+<!-- =====                                             ====== -->
+
+<!-- SVG definitions used by pointer: change colours using CSS at top of file! -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg"><symbol id="ring-svg" viewBox="0 0 290 290" preserveAspectRatio="xMidYMid meet"><ellipse rx="70" ry="70" stroke="var(--ringstroke,#ff0)" fill="none" stroke-width="20" transform="translate(145,145)"/></symbol>
+<symbol id="finger-svg" viewBox="0 0 290 290" preserveAspectRatio="xMidYMid meet"><g transform="translate(186.8,205.9) rotate(36) translate(-86.4,-47.2)"><path d="M170.8 68.7l1.9-50c0-12.7-5.1-6-13-9c-7.5-8.5-35.4-15-59.5-3.7l-69.7 1.7c-17 0-17 24 0 24l51.1-1.4c13.1 22.7 15.6 54.8 39 58.2c12.8 .2 13.6 2.7 32.1-11.8c11-1.8 18.5 1 18-8Z" stroke="var(--fingerstroke,#000)" fill="var(--fingerfill,#ff0)" stroke-width="5" stroke-linecap="square"/><rect width="58.1" height="23.7" stroke="var(--fingerstroke,#000)" fill="var(--fingerfill,#ff0)" rx="12" stroke-width="5" transform="translate(105,30.1) rotate(-20) translate(-45.5,-11.5)"/><rect width="55.4" height="21" stroke="var(--fingerstroke,#000)" fill="var(--fingerfill,#ff0)" rx="12" stroke-width="5" transform="translate(115.8,51.1) rotate(-20) translate(-45.5,-11.5)"/><rect width="25.1" height="34.7" fill="var(--fingerfill,#ff0)" rx="12" transform="translate(123.9,24.2) rotate(-45) translate(-12.6,-14.4)"/><ellipse rx="10" ry="10" fill="var(--fingerfill,#ff0)" transform="translate(95.2,45.3) rotate(-36)"/><ellipse rx="17.1" ry="10.8" fill="var(--fingerfill,#ff0)" transform="translate(94.6,24.2) rotate(-36) translate(7.1,.8)"/><rect width="39.2" height="21" stroke="var(--fingerstroke,#000)" fill="var(--fingerfill,#ff0)" rx="12" stroke-width="5" transform="translate(133.7,65.9) rotate(-24) translate(-45.5,-11.5)"/><path d="M105.8 3.7c-11 10-15.5 16-20.7 21.8c-5.2 5.9-2 13.5-0.3 20.2c5.5 22.5 25.5 18.5 23 4c-1.3-7.1-5.1-12.8 3-18c5.5-3.5 6-4.5 6 6c3.5 5 14.5 12 28 5" stroke="var(--fingerstroke,#000)" fill="none" stroke-width="5" stroke-linecap="round" stroke-linejoin="bevel"/></g></symbol></svg> 
+<script>
+if (! window.FeeblePoint2) { (function( FeeblePoint2, undefined ) {
+  
+  //----------------------------------------------------------------------
+  //  FeeblePoint2     edit a few basic settings here, if you need to
+  //---------------------------------------------------------------------- 
+  // disable things by setting to false:
+  // if you disable a feature its keys settings will be ignored for you
+
+  const WANT_LEGEND_IN_HEADER         = true; // show keys at top of page?
+  const WANT_POINTER_ACTIONS          = true; // have pointer appear?
+  const WANT_SLIDE_NAVIGATION_ACTIONS = true; // jump between headings?
+
+  // change keys here!
+  //  - use "shift", "alt", "ctrl" and the keycode, separated by +
+  //  - case matters! (use the JavaScript keycode names)
+  //  - set a value to empty ("") to disable a single action
+  //  
+  //  examples: "KeyP", "Digit9", "ctrl+alt+shift+KeyZ"
+  
+  const KEY_FOR_POINTER_FINGER = "KeyP";
+  const KEY_FOR_POINTER_RING   = "shift+KeyP";
+  const KEY_FOR_ADVANCE_SLIDE  = "Enter";
+  const KEY_FOR_BACK_SLIDE     = "KeyB";
+  const KEY_FOR_INDEX_SLIDE    = "Digit0";
+
+  const SLIDE_TAG = 'h2'; // If you change this, probably need to fix CSS too
+
+  // that's probably all you need to change
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  
+
+  const POINTER_FINGER="finger", POINTER_RING="ring",
+  ADVANCE_SLIDE="advance", INDEX_SLIDE= "index", BACK_SLIDE= "back";
+  let key_codes = {};
+  key_codes[ POINTER_FINGER ] = KEY_FOR_POINTER_FINGER;
+  key_codes[ POINTER_RING   ] = KEY_FOR_POINTER_RING;
+  key_codes[ ADVANCE_SLIDE  ] = KEY_FOR_ADVANCE_SLIDE;
+  key_codes[ INDEX_SLIDE    ] = KEY_FOR_INDEX_SLIDE;
+  key_codes[ BACK_SLIDE     ] = KEY_FOR_BACK_SLIDE;
+
+  let key_desc = {};
+  key_desc[POINTER_FINGER] = "for pointer";
+  key_desc[POINTER_RING]   = "for ring";
+  key_desc[ADVANCE_SLIDE]  = "to advance";
+  key_desc[INDEX_SLIDE]    = "to index/start";
+  key_desc[BACK_SLIDE]     = "to go back";
+
+  let key_controllers = {}
+  const KEY_CONTROL   = "ctrl";
+  const KEY_ALT       = "alt";
+  const KEY_SHIFT     = "shift";
+  const MODIFIER_KEYS = [KEY_CONTROL, KEY_ALT, KEY_SHIFT];  
+  let key_action_names = [ // order used in header legend
+    ADVANCE_SLIDE, INDEX_SLIDE, BACK_SLIDE,
+    POINTER_FINGER, POINTER_RING 
+  ]
+  // actions that aren't pointer types are slide actions
+  let POINTER_TYPES = [POINTER_FINGER, POINTER_RING];
+  
+  const CSS_JS_ENABLED = 'fp2';
+  const CSS_CURSOR_OFF = 'fp2-cursor-off';
+  const CSS_POINTER_DISPLAYED = "fp2-pointer-displayed";
+  const CSS_KEY = "fp2-key";
+  
+  function get_key_controller(str){
+    let is_enabled = false;
+    let modifier_functions = [];
+    let pretty = "";
+    let key = "";
+    if (str) {
+      keys = str.split("+");
+      for(let i=0; i<MODIFIER_KEYS.length; i++) {
+        let mkey = MODIFIER_KEYS[i];
+        let want_key = keys.includes(mkey);
+        let pretty_mkey;
+        if (mkey === KEY_CONTROL) {
+          modifier_functions.push(function(e){return e.ctrlKey === want_key});
+          pretty_mkey = "^";
+        }else if (mkey === KEY_ALT) {
+          modifier_functions.push(function(e){return e.altKey === want_key});
+          pretty_mkey = "Alt";
+        } else if (mkey === KEY_SHIFT) {
+          modifier_functions.push(function(e){return e.shiftKey === want_key});
+          pretty_mkey = "⇧";
+        }
+        if (want_key) {
+          pretty += pretty_mkey + "&nbsp;";
+        }
+      }
+      key = keys[keys.length-1];
+      pretty += key.replace(/^(Key|Digit)/, "");
+      is_enabled = true;
+    }
+    return {
+      is_enabled: is_enabled,
+      pretty: pretty,
+      key: key,
+      modifier_functions: modifier_functions
+    }
+  }
+
+  function is_triggered_controller(event, action_name) {
+    let controller = key_controllers[action_name];
+    let is_triggered = false;
+    if (controller && controller.key === event.code) {
+      is_triggered = true;
+      for (let i=0; i<controller.modifier_functions.length; i++) {
+        is_triggered = is_triggered && controller.modifier_functions[i](event);
+      }
+    }
+    return is_triggered;
+  }
+
+  let pointer_div;
+  let is_pointer_displayed = false;
+  let pointer_type = null;
+  let curr_id = 0;
+  let url = window.location.href;
+  let qty_headings = 0;
+  let headings = document.getElementsByTagName(SLIDE_TAG.toLowerCase());
+  
+  const body = document.body;
+  body.classList.add("fp2");
+  
+  if (WANT_POINTER_ACTIONS) {
+    
+    function toggle_pointer_display(){
+      if (is_pointer_displayed) {
+        pointer_div.classList.remove(CSS_POINTER_DISPLAYED);
+        body.classList.remove(CSS_CURSOR_OFF);
+      } else {
+        pointer_div.classList.add(CSS_POINTER_DISPLAYED);
+        body.classList.add(CSS_CURSOR_OFF);
+      }
+      is_pointer_displayed = ! is_pointer_displayed;
+    }
+
+    function change_pointer_type(to_type) {
+      if (pointer_type != to_type) {
+        pointer_type = to_type;
+        // clumsy to use innerHTML here... but it works
+        pointer_div.innerHTML='<svg><use xlink:href="#' + pointer_type + '-svg"></use></svg>';
+        POINTER_TYPES.forEach(function(type_name) {
+          if (type_name == to_type) {
+            pointer_div.classList.add(to_type);
+          } else {
+            pointer_div.classList.remove(type_name);
+          }
+        });
+      }
+    }
+    
+    document.onmousemove = function (event) {
+      event = event || window.event; // IE-ism
+      if (event.pageX == null && event.clientX != null) {
+        event.pageX = event.clientX +
+          (document.scrollLeft || body && body.scrollLeft || 0) -
+          (document.clientLeft || body && body.clientLeft || 0);
+        event.pageY = event.clientY +
+          (document.scrollTop  || body && body.scrollTop  || 0) -
+          (document.clientTop  || body && body.clientTop  || 0 );
+      }
+      pointer_div.style.left = event.pageX + "px";
+      pointer_div.style.top  = event.pageY + "px";
+    };
+    
+    pointer_div = document.createElement("div"); 
+    pointer_div.id = "fp2-pointer";
+    body.appendChild(pointer_div);
+
+  }
+  
+  // set up key controllers
+  let header_html_items = [];
+  for (let i=0; i<key_action_names.length; i++){
+    let action_name = key_action_names[i];
+    if (key_codes[action_name]) {
+      let is_a_pointer_action = POINTER_TYPES.includes(action_name);
+      // only register keys implementing behaviour we want
+      if ((WANT_POINTER_ACTIONS && is_a_pointer_action) 
+        || (WANT_SLIDE_NAVIGATION_ACTIONS && ! is_a_pointer_action)) {
+        let controller = get_key_controller(key_codes[action_name]);
+        if (controller.is_enabled) {
+          key_controllers[action_name] = controller;
+          header_html_items.push(
+            "<li>press <span class='" + CSS_KEY + "'>" + controller.pretty
+            + "</span> " + key_desc[action_name] + "</li>"
+          );
+        }
+      }
+    }
+  }
+
+  if (WANT_SLIDE_NAVIGATION_ACTIONS) {
+    let top_000 = document.createElement('span');
+    top_000.id = "000";
+    body.prepend(top_000);
+  }
+
+  if (WANT_LEGEND_IN_HEADER) {
+    let header_html = header_html_items.join(",\n");
+    if (header_html) {
+      header_html = "<ul>" + header_html + "</ul>";
+    }
+    let header = document.createElement("header");
+    header.id = "fp2-legend";
+    header.innerHTML = header_html;
+    body.prepend(header);
+  }
+
+  if (WANT_SLIDE_NAVIGATION_ACTIONS) {
+    
+    function get_id(n, offset) {
+      if (typeof n === 'string') {
+        n = parseInt(n, 10);
+        if (isNaN(n)) { n = 0; }
+      }
+      if (offset > 0) {
+        if (n < qty_headings - 1) { n += offset; }
+      } else if (offset < 0){
+        if (n > 0) { n += offset; }
+      }
+      return ("0000" + n).slice(-3);
+    }
+
+    function get_prev(n) { return get_id(n, -1); }
+    function get_next(n) { return get_id(n, +1); }
+    
+    body.appendChild(document.createElement(SLIDE_TAG.toLowerCase()));
+
+    for (var i=0; i < headings.length; i++) {
+      let element = headings.item(i);
+      element.classList.add("stop");
+    }
+
+    headings = document.getElementsByClassName("stop");
+    qty_headings = headings.length;
+    for (var i=0; i < qty_headings; i++) {
+      let element = headings.item(i);
+      element.id = get_id(i+1);
+    };
+    let ihash = url.indexOf('#');
+    if (ihash > -1) {
+      if (ihash < url.length-1) {
+        curr_id = get_id(url.substring(ihash+1));
+      }
+      url = url.substring(0, ihash);
+    }
+    
+    function goto(id) {
+      element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({behavior: 'smooth', block: 'start'});
+      } // else failed to find element with this id
+    }
+
+  }  
+
+  /* risky for anything other than simple text: this might
+     break embedded markup... good for <p> tags etc        */
+  let rainbows = document.getElementsByClassName("rainbow");
+  const re = /\s+/
+  for (var i=0; i < rainbows.length; i++) {
+    let text = rainbows[i].innerHTML;
+    let texts = text.split(re);
+    for (var j=0; j < texts.length; j++) {
+      texts[j] = "<span class='" 
+      + "abcdefghijklmnopqrstuvwxyz"[Math.floor(Math.random() * 26)]
+       + "'>" + texts[j] + "</span>";
+    }
+    rainbows[i].innerHTML = texts.join(" ");
+  }
+  
+  document.addEventListener('keydown', function(event) {
+    let is_jump = false;
+    if (is_triggered_controller(event, ADVANCE_SLIDE)) {
+      curr_id = get_next(curr_id);
+      is_jump = true;
+    } else if (is_triggered_controller(event, BACK_SLIDE)) {
+      curr_id = get_prev(curr_id);
+      is_jump = true;
+    } else if (is_triggered_controller(event, INDEX_SLIDE)) {
+      curr_id = get_id(0, 0);
+      is_jump = true;
+    } else {
+      let WANT_POINTER_ACTIONS_type = null;
+      if (is_triggered_controller(event, POINTER_FINGER)) {
+        WANT_POINTER_ACTIONS_type = POINTER_FINGER
+      } else if (is_triggered_controller(event, POINTER_RING)) {
+        WANT_POINTER_ACTIONS_type = POINTER_RING
+      }
+      if (WANT_POINTER_ACTIONS_type != null) {
+        want_toggle = true;
+        if (WANT_POINTER_ACTIONS_type != pointer_type) { // change the pointer type
+          if (is_pointer_displayed) {
+            want_toggle = false;
+          }
+          change_pointer_type(WANT_POINTER_ACTIONS_type);
+        }
+        if (want_toggle) {
+          toggle_pointer_display();
+        }
+      }
+    }
+    if (is_jump) {
+      goto(curr_id);
+      window.history && window.history.pushState && window.history.pushState("", "", url + "#" + curr_id);
+    }
+  });
+
+  }( window.FeeblePoint2 = window.FeeblePoint2 || {} ));
+}
+</script>
+
+</body>
+</html>
