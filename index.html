@@ -20,14 +20,15 @@
     --fingerfill: #ffff00;
     --fingerstroke: #000000;
     --ringstroke: #ff0000;
+    --pointersize: 6em;
   }
   
   /* pointer: 6em × 6em containing a square SVG */
   #fp2-pointer {
     visibility: hidden; opacity: 0.00;
-    width:6em;
-    height:6em;
-    margin:-3em; /* position center of image at cursor */
+    width:var(--pointersize);
+    height:var(--pointersize);
+    margin: calc(var(--pointersize)/-2);
     padding:0;
     pointer-events: none;
     position:absolute; 
@@ -35,7 +36,7 @@
     left:0;
   }
   #fp2-pointer.fp2-pointer-displayed { visibility: visible; opacity: 0.75; }
-  #fp2-pointer svg { width:6em; height: 6em; }
+  #fp2-pointer svg { width:var(--pointersize); height:var(--pointersize); }
   /*
     each pointer type has its own class (currently: finger, ring) 
     ...override their settings here
