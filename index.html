@@ -23,7 +23,7 @@
     --pointersize: 6em;
   }
   
-  /* pointer: 6em × 6em containing a square SVG */
+  /* pointer: div located at mouse position, containing a square SVG */
   #fp2-pointer {
     visibility: hidden; opacity: 0.00;
     width:var(--pointersize);
@@ -164,6 +164,12 @@
   .tiny-footer { font-size:20px; padding:2em; text-align:left;}
   .tiny-footer img { float:right;}
   
+  @media (max-width: 30rem) {
+    body { font-size:100%; }
+    .big, .biggish{ font-size:3rem; }
+    .biggish { font-size:2rem; }
+    .less-big{ font-size:1rem; }
+  }
   </style>
 </head>
 <body>
